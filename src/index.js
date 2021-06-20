@@ -1,2 +1,5 @@
 let title = require('./title');
-console.log(title);
+let text = require('./content.txt');
+import './style/index.css';
+import './style/less.less';
+import './style/sass.scss';
