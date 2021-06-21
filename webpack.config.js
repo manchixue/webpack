@@ -7,8 +7,16 @@ module.exports = {
 		path: path.resolve(__dirname, 'dist'),
 		filename: "main.js"
 	},
+	devtool: 'eval-source-map',
 	module: {
 		rules: [
+			{
+				test: /\.jsx?$/,
+				use: {
+					loader: 'babel-loader'
+				},
+				exclude: '/node_modules/'
+			},
 			{
 				test: /\.txt$/,
 				use: 'raw-loader'
