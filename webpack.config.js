@@ -1,5 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 module.exports = {
 	mode: "none",
 	entry: './src/index.js',
@@ -8,6 +11,12 @@ module.exports = {
 		filename: "main.js"
 	},
 	devtool: 'eval-source-map',
+	optimization: {
+		minimize: true,
+		minimizer: [
+			new TerserPlugin()
+		]
+	},
 	module: {
 		rules: [
 			{
@@ -24,7 +33,7 @@ module.exports = {
 			{
 				test: /\.css$/,
 				use: [
-					'style-loader',
+					MiniCssExtractPlugin.loader,
 					{
 						loader: 'css-loader',
 						options: {
@@ -37,7 +46,7 @@ module.exports = {
 			{
 				test: /\.less$/,
 				use: [
-					'style-loader',
+					MiniCssExtractPlugin.loader,
 					{
 						loader: 'css-loader',
 						options: {
@@ -51,7 +60,7 @@ module.exports = {
 			{
 				test: /\.scss$/,
 				use: [
-					'style-loader',
+					MiniCssExtractPlugin.loader,
 					{
 						loader: 'css-loader',
 						options: {
@@ -66,8 +75,16 @@ module.exports = {
 	},
 	plugins: [
 		new HtmlWebpackPlugin({
-			template: './src/index.html'
-		})
+			template: './src/index.html',
+			minify: {
+				collapseWhitespace: true,
+				removeComments: true
+			}
+		}),
+		new MiniCssExtractPlugin({
+			filename: '[name].[hash:6].css'
+		}),
+		new OptimizeCssAssetsWebpackPlugin()
 	],
 	devServer: {
 		contentBase: path.resolve(__dirname, 'dist'),
