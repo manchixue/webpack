@@ -1,4 +1,4 @@
-let title = require('./module/title');
+import name, { age } from './module/title.js';
 
-console.log(title);
-console.log(title.age);
+console.log(name);
+console.log(age);

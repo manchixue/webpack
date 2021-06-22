@@ -37,7 +37,7 @@ function require (moduleId) {
 	return module.exports;
 }
 
-// require defineProperty
+// require defineProperty  给对象的每个字段定义getter属性描述器
 require.d = (exports, definition) => {
 	for (const key in definition) {
 		if (require.o(definition, key) && !require.o(exports, key)) {
@@ -49,16 +49,17 @@ require.d = (exports, definition) => {
 	}
 }
 
-// require hasOwnProperty
+// require hasOwnProperty  判断是否拥有该属性
 require.o = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop)
 
-// require 声明是esModule模块
+// require 声明是esModule模块   声明是一个es6 module
 require.r = (exports) => {
 	Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 	Object.defineProperty(exports, '__esModule', { value: true });
 }
 
 var exports = {};
-
+require.r(exports)
 let title = require('./src/module/title.js');
-console.log(title);
+console.log(title.default);
+console.log(title.age);
