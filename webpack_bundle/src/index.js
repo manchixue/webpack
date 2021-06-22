@@ -1,4 +1,4 @@
 let title = require('./module/title');
 
-console.log(title.name);
+console.log(title);
 console.log(title.age);

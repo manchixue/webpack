@@ -1,3 +1,3 @@
-exports.name = '名称';
+export default 'name';
 
-exports.age = 'age';
+export const age = '12';
