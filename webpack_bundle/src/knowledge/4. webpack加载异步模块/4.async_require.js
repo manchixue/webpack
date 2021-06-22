@@ -6,9 +6,12 @@
 
 /*
 * 步骤:
-* 1. 定义全局模块modules, 模块上存着每个模块的内部实现
-* 2. 定义require函数, 创建一个模块初始化对象{exports: {}}, 根据传入的moduleId 在modules中找到对应的模块函数执行并传入初始化模块对象
-* 3. 入口调用require函数
+* 1. require.e开始加载异步模块, 初始化promise, 并通过jsonp加载异步模块
+* 2. 异步模块缓存判断, 没有缓存则初始化promise, 并放入require.e生成的promises数组里
+* 3. 解析异步模块url
+* 4. 动态创建script标签jsonp获取异步模块
+* 5. 获取异步模块后  会调用全局定义好的一个webpack全局变量上面的push方法, 出发jsonp回调
+* 6. 在jsonp回调中, 根据chunkIds数组, 将每个异步请求resolve, 并将每个异步模块装在到全局modules下
 * */
 
 var modules = {
