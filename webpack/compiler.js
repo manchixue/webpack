@@ -1,4 +1,5 @@
-let { SyncHook } = require('tapable')
+let { SyncHook } = require('tapable');
+let Compilation = require('./Compilation');
 
 class Compiler {
 	constructor (options) {
@@ -16,6 +17,10 @@ class Compiler {
 		this.hooks.run.call();
 
 		// 编译...
+		// 初始化一个Compilation实例
+		let compilation = new Compilation(this.options);
+
+		compilation.build(callback);
 
 		this.hooks.done.call();
 

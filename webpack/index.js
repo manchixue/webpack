@@ -1,6 +1,9 @@
 let Compiler = require('./compiler');
 
 function webpack (config) {
+	let defaultConfig = {
+		context: process.cwd(), // 内置默认提供的选项
+	};
 	let shellConfig = process.argv.slice(2).reduce((shellConfig, arg) => {
 		let [name, value] = arg.split('=');
 
@@ -8,6 +11,7 @@ function webpack (config) {
 	}, {});
 
 	let resultConfig = {
+		...defaultConfig,
 		...config,
 		...shellConfig
 	}

@@ -1,3 +1,2 @@
-console.log(1);
-
-module.exports = {};
+let title = require('./title1');
+console.log(title);

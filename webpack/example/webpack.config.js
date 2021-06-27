@@ -5,7 +5,22 @@ let endPlugin = require('./plugins/end_plugin');
 module.exports = {
 	mode: 'development',
 	entry: {
-		main: './src/index.js'
+		main: './src/index.js',
+		// entry2: './src/entry2.js'
+	},
+	module: {
+		rules: [
+			{
+				test: /\.js$/,
+				use: [
+					path.resolve(__dirname, 'loaders', 'loader1'),
+					path.resolve(__dirname, 'loaders', 'loader2')
+				]
+			}
+		]
+	},
+	resolve: {
+		extensions: ['.js', '.jsx', '.json']
 	},
 	output: {
 		filename: '[name].js',
