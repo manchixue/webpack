@@ -12,8 +12,10 @@ class Compilation {
 	constructor (options) {
 		this.options = options;
 		this.modules = [];
-		this.chunks = [];
-		this.files = [];
+		this.chunks = []; // 代码块
+		this.files = []; // 入口文件名集合
+		this.assets = {}; // 入口文件名为key, 值为带有commonjs引入的代码
+		this.entries = []; // name, entryModule, modules
 		this.dependencies = [];
 	}
 	build (callback) {
@@ -25,8 +27,28 @@ class Compilation {
 			// 获取entry的绝对路径
 			let entryFilePath = toUnixPath(path.join(this.options.context, entry[entryName]))
 			let entryModule = this.buildModule(entryName, entryFilePath);
-			console.log(entryModule);
+			let chunk = {
+				name: entryName,
+				entryModule,
+				modules: this.modules.filter(item => item.name === entryName || item.extraName.includes(entryName))
+			};
+
+			this.entries.push(chunk);
+			this.chunks.push(chunk);
 		}
+
+		this.chunks.forEach(chunk => {
+			let filename = this.options.output.filename.replace('[name]', chunk.name);
+			this.assets[filename] = getSource(chunk);
+		});
+
+		callback(null, {
+			entries: this.entries,
+			chunks: this.chunks,
+			modules: this.modules,
+			files: this.files,
+			assets: this.assets
+		})
 	}
 
 	buildModule (name, modulePath) {
@@ -72,7 +94,7 @@ class Compilation {
 					let depModulePath = path.posix.join(dirname, moduleName)
 					let { extensions } = this.options.resolve;
 
-					// 解析文件格式  ./title -> ./src/title.js
+					// 解析文件格式  ./title -> src/title.js
 					depModulePath = tryExtensions(depModulePath, extensions);
 
 					// depModuleId = ./src/title.js
@@ -94,13 +116,48 @@ class Compilation {
 
 		module.dependencies.forEach((dependency) => {
 			let { depModuleId, depModulePath } = dependency;
-			let dependencyModule = this.buildModule(name, depModulePath)
-			this.modules.push(dependencyModule)
+			let depModule = this.modules.find(item => item.name === depModuleId);
+			if (depModule) {
+				(depModule.extraName = depModule.extraName ||[]).push(name)
+			} else {
+				let dependencyModule = this.buildModule(name, depModulePath)
+				this.modules.push(dependencyModule)
+			}
 		})
-
 
 		return module;
 	}
+}
+
+function getSource (chunk) {
+	return `
+		(() => {
+  var modules = ({
+    ${chunk.modules.map(module => `
+        "${module.id}": (module, exports, require)=> {
+            ${module._source}
+        }
+    `).join(',')}
+  });
+  var cache = {};
+  function require(moduleId) {
+    var cachedModule = cache[moduleId];
+    if (cachedModule !== undefined) {
+      return cachedModule.exports;
+    }
+    var module = cache[moduleId] = {
+      exports: {}
+    };
+    modules[moduleId](module, module.exports, require);
+    return module.exports;
+  }
+  var exports = {};
+  (() => {
+    ${chunk.entryModule._source}
+  })();
+})()
+  ;
+	`;
 }
 
 function tryExtensions (depModulePath, extensions = []) {

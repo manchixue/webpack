@@ -4,6 +4,7 @@ let endPlugin = require('./plugins/end_plugin');
 
 module.exports = {
 	mode: 'development',
+	devtool: false,
 	entry: {
 		main: './src/index.js',
 		// entry2: './src/entry2.js'

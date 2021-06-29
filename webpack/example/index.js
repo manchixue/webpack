@@ -8,5 +8,5 @@ let compiler = webpack(config);
 
 compiler.run((err, stat) => {
 	console.log(err);
-	console.log(stat.toJSON());
+	console.log(stat.toJson());
 })
